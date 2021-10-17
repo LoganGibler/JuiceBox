@@ -1,7 +1,7 @@
 const express = require("express");
 const server = express();
 const morgan = require("morgan");
-const PORT = 3000;
+const PORT = 8100;
 const apiRouter = require("./api");
 const { client } = require('./db');
 require('dotenv').config();
