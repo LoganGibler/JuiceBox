@@ -62,7 +62,7 @@ async function updateUser(id, fields = {}) {
   }
 }
 
-async function createPost({ authorId, title, content }) {
+async function createPost({ authorId, title, content, tags }) {
   try {
     const {
       rows: [post],
@@ -74,12 +74,27 @@ async function createPost({ authorId, title, content }) {
       `,
       [authorId, title, content]
     );
-
+    // const tagList = await createTags(tags);
+    // return getTagToPost(post.id, tagList);
     return post;
   } catch (error) {
     throw error;
   }
 }
+
+
+
+// async function getTagToPost(postId, tagList) {
+//   try {
+//     const tag = tagList.map((tag) => createPostTag(postId, tag.id));
+
+//     await Promise.all(tag);
+
+//     return await getPostById(postId);
+//   } catch (error) {
+//     throw error;
+//   }
+// }
 
 async function updatePost(id, fields = {}) {
   const setString = Object.keys(fields)
@@ -113,10 +128,20 @@ async function updatePost(id, fields = {}) {
 async function getAllPosts() {
   try {
     const rows = await client.query(
-      `SELECT *
-        FROM posts;
-      `
+      `SELECT * FROM posts;`
     );
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function getAllTags() {
+  try {
+    const { rows } = await client.query(`
+    SELECT * FROM tags;
+    `);
+    console.log("this is tags", rows);
     return rows;
   } catch (error) {
     throw error;
@@ -129,8 +154,8 @@ async function getPostsByUser(userId) {
       SELECT * FROM posts
       WHERE "authorId"=${userId};
     `);
-    console.log("this is userId", userId);
-    console.log("this is rows", rows);
+    // console.log("this is userId", userId);
+    // console.log("this is rows", rows);
     return rows;
   } catch (error) {
     throw error;
@@ -156,17 +181,6 @@ async function getUserById(userId) {
   } catch (error) {
     throw error;
   }
-
-  // (1) an object that contains
-  // (2) a `rows` array that (in this case) will contain
-  // (3) one object, which is our user.
-  // if it doesn't exist (if there are no `rows` or `rows.length`), return null
-
-  // if it does:
-  // delete the 'password' key from the returned object
-  // get their posts (use getPostsByUser)
-  // then add the posts to the user object with key 'posts'
-  // return the user object
 }
 
 module.exports = {
@@ -179,4 +193,6 @@ module.exports = {
   getPostsByUser,
   updatePost,
   createPost,
+  getAllTags,
+  // getTagToPost,
 };
