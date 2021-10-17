@@ -8,7 +8,8 @@ const {
   getPostsByUser,
   updatePost,
   createPost,
-  getAllTags
+  getAllTags,
+  getUserByUsername,
 } = require("./index");
 
 async function dropTables() {
@@ -147,7 +148,7 @@ async function testDB() {
 
     console.log("Calling getAllUsers");
     const users = await getAllUsers();
-    console.log("Result:", users);
+    console.log("WHAT IS USERS?", users);
 
     console.log("Calling updateUser on users[0]");
     const updateUserResult = await updateUser(users[0].id, {
@@ -161,9 +162,9 @@ async function testDB() {
     console.log(" 136 Result:", posts);
 
     console.log("Calling updatePost on posts[0]");
-    console.log("what is posts?", posts);
-    console.log("what is posts.rows?", posts.rows);
-    console.log("what is posts.rows at [0].id?", posts.rows[0].id);
+    // console.log("what is posts?", posts);
+    // console.log("what is posts.rows?", posts.rows);
+    // console.log("what is posts.rows at [0].id?", posts.rows[0].id);
 
     const updatePostResult = await updatePost(posts.rows[0].id, {
       title: "New Title",
