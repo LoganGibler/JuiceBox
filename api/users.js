@@ -1,23 +1,24 @@
 const express = require("express");
 const usersRouter = express.Router();
-const { getAllUsers, createUser } = require("../db");
 const jwt = require("jsonwebtoken");
+
+const { getAllUsers, getUserByUsername, createUser } = require("../db");
 
 usersRouter.use((req, res, next) => {
   console.log("A request is being made to /users");
 
-  next(); // THIS IS DIFFERENT
+  next();
 });
 
-usersRouter.get("/", async (req, res) => {
+usersRouter.get("/", async (req, res, next) => {
   const users = await getAllUsers();
-  // console.log("this is users", users)
+
   res.send({
     users,
   });
 });
 
-usersRouter.post("/login", async (req, res, next) => {
+usersRouter.get("/login", async (req, res, next) => {
   const { username, password } = req.body;
 
   // request must have both
@@ -30,8 +31,10 @@ usersRouter.post("/login", async (req, res, next) => {
 
   try {
     const user = await getUserByUsername(username);
-    console.log("this is getting userbyusername", user)
+
     if (user && user.password == password) {
+      // create token & return to user
+
       const token = jwt.sign(
         { id: 1, username: "albert" },
         process.env.JWT_SECRET,
@@ -39,7 +42,6 @@ usersRouter.post("/login", async (req, res, next) => {
           expiresIn: "1h",
         }
       );
-      console.log("this is token", token)
       res.send(token);
     } else {
       next({
@@ -53,7 +55,7 @@ usersRouter.post("/login", async (req, res, next) => {
   }
 });
 
-usersRouter.post('/register', async (req, res, next) => {
+usersRouter.post("/register", async (req, res, next) => {
   const { username, password, name, location } = req.body;
 
   try {
@@ -61,8 +63,8 @@ usersRouter.post('/register', async (req, res, next) => {
 
     if (_user) {
       next({
-        name: 'UserExistsError',
-        message: 'A user by that username already exists'
+        name: "UserExistsError",
+        message: "A user by that username already exists",
       });
     }
 
@@ -73,20 +75,24 @@ usersRouter.post('/register', async (req, res, next) => {
       location,
     });
 
-    const token = jwt.sign({ 
-      id: user.id, 
-      username
-    }, process.env.JWT_SECRET, {
-      expiresIn: '1w'
-    });
+    const token = jwt.sign(
+      {
+        id: user.id,
+        username,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1w",
+      }
+    );
 
-    res.send({ 
+    res.send({
       message: "thank you for signing up",
-      token 
+      token,
     });
   } catch ({ name, message }) {
-    next({ name, message })
-  } 
+    next({ name, message });
+  }
 });
 
 module.exports = usersRouter;

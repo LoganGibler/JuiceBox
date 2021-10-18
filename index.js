@@ -1,14 +1,10 @@
+require("dotenv").config();
+const PORT = 3000;
 const express = require("express");
 const server = express();
 const morgan = require("morgan");
-const PORT = 8100;
-const apiRouter = require("./api");
-const { client } = require('./db');
-require('dotenv').config();
-
-server.use(morgan('dev'));
-server.use(express.json())
-server.use("/api", apiRouter);
+server.use(morgan("dev"));
+server.use(express.json());
 
 server.use((req, res, next) => {
   console.log("<____Body Logger START____>");
@@ -18,24 +14,19 @@ server.use((req, res, next) => {
   next();
 });
 
+server.get('/add/:first/to/:second', (req, res, next) => {
+  res.send(`<h1>${ req.params.first } + ${ req.params.second } = ${
+    Number(req.params.first) + Number(req.params.second)
+   }</h1>`);
+   next();
+});
+
+const apiRouter = require("./api");
+server.use("/api", apiRouter);
+
+const { client } = require("./db");
 client.connect();
 
 server.listen(PORT, () => {
   console.log("The server is up on port", PORT);
 });
-
-
-// POST /api/users/register
-// POST /api/users/login
-// DELETE /api/users/:id
-
-// GET /api/posts
-// POST /api/posts
-// PATCH /api/posts/:id
-// ``
-// DELETE /api/posts/:id
-
-// GET /api/tags
-// GET /api/tags/:tagName/posts
-
-// inside index.js
