@@ -55,7 +55,7 @@ usersRouter.get("/login", async (req, res, next) => {
   }
 });
 
-usersRouter.post("/register", async (req, res, next) => {
+usersRouter.get("/register", async (req, res, next) => {
   const { username, password, name, location } = req.body;
 
   try {
